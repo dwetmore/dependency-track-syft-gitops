@@ -1,0 +1,51 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: dependency-track
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://dependencytrack.github.io/helm-charts
+    chart: dependency-track
+    targetRevision: 0.42.0
+    helm:
+      values: |
+        common:
+          secretKey:
+            createSecret: true
+
+        apiServer:
+          persistentVolume:
+            enabled: true
+            className: microk8s-hostpath
+            size: 10Gi
+          extraEnv:
+            - name: ALPINE_DATABASE_MODE
+              value: external
+            - name: ALPINE_DATABASE_URL
+              value: jdbc:postgresql://dependency-track-postgresql.dependency-track.svc.cluster.local:5432/dtrack
+            - name: ALPINE_DATABASE_DRIVER
+              value: org.postgresql.Driver
+            - name: ALPINE_DATABASE_USERNAME
+              value: dtrack
+            - name: ALPINE_DATABASE_PASSWORD
+              value: CHANGE_ME_DB_PASSWORD
+          service:
+            type: NodePort
+            nodePort: 30084
+
+        frontend:
+          apiBaseUrl: http://127.0.0.1:18081
+          service:
+            type: NodePort
+            nodePort: 30083
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: dependency-track
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

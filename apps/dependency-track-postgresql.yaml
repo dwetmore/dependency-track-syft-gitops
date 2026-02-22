@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: dependency-track-postgresql
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://charts.bitnami.com/bitnami
+    chart: postgresql
+    targetRevision: 18.4.0
+    helm:
+      values: |
+        auth:
+          username: dtrack
+          database: dtrack
+          password: CHANGE_ME_DB_PASSWORD
+          postgresPassword: CHANGE_ME_POSTGRES_PASSWORD
+        primary:
+          persistence:
+            enabled: true
+            storageClass: microk8s-hostpath
+            size: 10Gi
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: dependency-track
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

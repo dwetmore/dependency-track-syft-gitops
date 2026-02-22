@@ -1,0 +1,34 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: syft-sbom-milvus
+  namespace: sbom
+spec:
+  schedule: "30 2 * * *"
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 2
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: syft
+              image: anchore/syft:latest
+              imagePullPolicy: IfNotPresent
+              command:
+                - syft
+                - scan
+                - registry:milvusdb/milvus:v2.5.0-beta
+                - -o
+                - cyclonedx-json=/data/milvus_v2.5.0-beta.cdx.json
+                - -o
+                - spdx-json=/data/milvus_v2.5.0-beta.spdx.json
+              volumeMounts:
+                - name: sbom-output
+                  mountPath: /data
+          volumes:
+            - name: sbom-output
+              persistentVolumeClaim:
+                claimName: syft-sbom-output
