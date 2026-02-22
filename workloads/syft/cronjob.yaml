@@ -17,8 +17,7 @@ spec:
             - name: syft
               image: anchore/syft:latest
               imagePullPolicy: IfNotPresent
-              command:
-                - syft
+              args:
                 - scan
                 - registry:milvusdb/milvus:v2.5.0-beta
                 - -o
