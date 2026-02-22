@@ -14,8 +14,10 @@ spec:
         auth:
           username: dtrack
           database: dtrack
-          password: CHANGE_ME_DB_PASSWORD
-          postgresPassword: CHANGE_ME_POSTGRES_PASSWORD
+          existingSecret: dependency-track-db
+          secretKeys:
+            adminPasswordKey: postgres-password
+            userPasswordKey: password
         primary:
           persistence:
             enabled: true

@@ -30,7 +30,10 @@ spec:
             - name: ALPINE_DATABASE_USERNAME
               value: dtrack
             - name: ALPINE_DATABASE_PASSWORD
-              value: CHANGE_ME_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: dependency-track-db
+                  key: password
           service:
             type: NodePort
             nodePort: 30084
