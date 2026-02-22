@@ -48,6 +48,7 @@ spec:
               name: dependency-track-frontend
               annotations:
                 nginx.ingress.kubernetes.io/ssl-redirect: "false"
+                nginx.ingress.kubernetes.io/proxy-body-size: "32m"
             spec:
               rules:
                 - host: dtrack.172.17.93.185.nip.io
